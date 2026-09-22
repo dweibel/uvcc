@@ -3,3 +3,6 @@ node_modules/
 tsconfig.tsbuildinfo
 .uvccrc
 .uvccrc.json
+
+# Compiled camera holder, built from camhold.swift by hold-camera.sh
+/camhold
