@@ -4,6 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `uvcc` is a CLI that reads and writes USB Video Class (UVC) camera controls — brightness, zoom, white balance, etc. It is an ESM-only TypeScript package published to npm, upstream at `github:joelpurra/uvcc`, GPL-3.0.
 
+## What this fork is for
+
+**The camera hold is the primary goal of this checkout.** Upstream `uvcc` is a general-purpose UVC control CLI; this fork exists to keep a Logitech C925e's 2x pan/zoom preset actually visible in Teams, and the CLI is the means rather than the end. Treat the hold as the thing being maintained and `src/` as a dependency of it.
+
+That work lives in untracked-upstream files at the repo root — `camhold.swift`, `hold-camera.sh`, `toggle-hold-camera.sh`, `set-camera-defaults.sh`, and `HOLD-CAMERA.md`, which is the reference for all of it and carries the maintenance notes. `./hold-camera.sh` is the entry point.
+
+Two consequences for changes here:
+
+- **A change to `src/` is judged by whether the hold still works,** not only by whether the CLI is correct in the abstract. `set-camera-defaults.sh` drives `uvcc set absolute_zoom` and `absolute_pan_tilt` through `dist/index.js`, so touching `CameraHelper`, the `set` handler, or device selection can break the preset without breaking anything a lint would notice.
+- **Merging upstream is routine; diverging from it is not.** Prefer solving a problem in the root-level scripts over patching `src/`, so the fork stays mergeable. If `src/` genuinely has to change, say so explicitly rather than folding it into a scripts change.
+
+`camhold.swift` is Swift and outside every gate in this file — `npm test` is lint only and does not see it. Build it with `swiftc -O`, or just run `./hold-camera.sh`, which rebuilds when the source is newer than the binary.
+
 ## Commands
 
 Node >= 22 is required. In a non-interactive agent shell `node` may not be on `PATH` even though it is installed; source nvm first:
