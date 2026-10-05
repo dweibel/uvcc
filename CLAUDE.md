@@ -17,6 +17,11 @@ Two consequences for changes here:
 
 `camhold.swift` is Swift and outside every gate in this file — `npm test` is lint only and does not see it. Build it with `swiftc -O`, or just run `./hold-camera.sh`, which rebuilds when the source is newer than the binary.
 
+Two failures here look like bugs in this repo and are not. Both are written up under **Things that will bite the next person** in `HOLD-CAMERA.md`; check there before debugging either.
+
+- **`hold-camera.sh`'s rebuild guard is an mtime test (`-nt`), not a content check.** A binary whose mtime is newer than a source it predates runs stale and silently, and the symptom is `camhold` rejecting a flag that `camhold.swift` plainly defines. Confirm with `strings camhold | grep usage` before concluding anything about the Swift source.
+- **`dlopen` of `node_modules/usb` failing with `errno=1` is endpoint security, not a broken module.** ThreatLocker allowlists by content hash, so any `npm install` that replaces the prebuilt `node.napi.node` can block it until re-approved. `errno=1` is `EPERM` on an intact, signed file. Do not re-sign it, thin it, or reinstall to "fix" it — those appear to work in a scratch copy and resolve nothing.
+
 ## Commands
 
 Node >= 22 is required. In a non-interactive agent shell `node` may not be on `PATH` even though it is installed; source nvm first:
